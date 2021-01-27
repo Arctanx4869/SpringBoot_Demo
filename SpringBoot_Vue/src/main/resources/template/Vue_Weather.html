@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vue_Weather</title>
+
+</head>
+<body>
+    <div id="app">
+        <input type="text" v-model="name" @keyup.delete="showByDelete" @keyup.enter="searchCity"> <input type="button" value="搜索" @click="searchCity"> <br>
+
+        <span v-for="city in Cities">
+            <a href="" @click.prevent="searchCityByHref(city)">{{ city }}</a> &nbsp;
+        </span>
+
+        <hr>
+
+        <span v-show="isShow">{{ name }}，今天的天气是:{{ message }}</span>
+    </div>
+
+<!--引入vue.js-->
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+<!--引入axios-->
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<script>
+    const app = new Vue({
+        el: "#app",  //element 用来给Vue实例定义一个作用范围
+        data: {      //用来给Vue实例定义一些相关数据
+            name:"",
+            Cities:["北京","上海","广州","深圳","天津"],
+            message:"",
+            isShow: false,
+        },
+        methods: {
+            searchCity(){
+                console.log(this.name);
+                //let _this = this;
+                axios.get("http://localhost:8080/city/find?name="+this.name)
+                /*.then(function (response){
+                    _this.message = response.data.msg;
+                    _this.isShow = true;
+                }*/
+                .then((response)=>{
+                    console.log(response.data.msg);
+                    this.message = response.data.msg;
+                    this.isShow = true;
+                }).catch(function (error){
+                    console.log(error);
+                });
+            },
+
+            searchCityByHref(name){
+                this.name = name;
+                this.searchCity()
+            },
+
+            showByDelete(){
+                this.isShow = false;
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

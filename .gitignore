@@ -1,5 +1,6 @@
 HELP.md
 target/
+/SpringBoot_Vue_Bootstrap/src/test
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/

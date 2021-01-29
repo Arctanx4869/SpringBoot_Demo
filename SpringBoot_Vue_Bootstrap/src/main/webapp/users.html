@@ -31,13 +31,13 @@
                 <form class="form-inline">
                     <div class="form-group">
                         <label for="searchName">姓名：</label>
-                        <input type="text" class="form-control" id="searchName">
+                        <input type="text" class="form-control" v-model="userName" id="searchName">
                     </div>
                     <div class="form-group">
                         <label for="searchPhone">电话号码：</label>
-                        <input type="text" class="form-control" id="searchPhone">
+                        <input type="text" class="form-control" v-model="userPhoneNumber" id="searchPhone">
                     </div>
-                    <button type="submit" class="btn btn-info">搜索</button>
+                    <button type="button" class="btn btn-info" @click="findUserByNameOrPhone">搜索</button>
                 </form>
             </div>
         </div>
@@ -62,7 +62,8 @@
                         <td>{{ user.age }}</td>
                         <td>{{ user.salary }}</td>
                         <td>{{ user.phoneNumber }}</td>
-                        <td><button class="btn btn-danger">删除</button>&nbsp;&nbsp;<button class="btn btn-primary">修改</button></td>
+                        <td><button class="btn btn-danger" @click="deleteUserById(user.id)">删除</button>&nbsp;&nbsp;
+                            <button class="btn btn-primary" @click="findUserById(user.id)">修改</button></td>
                     </tr>
                     </tbody>
                 </table>
@@ -71,22 +72,22 @@
                 <form>
                     <div class="form-group">
                         <label for="userName">姓名：</label>
-                        <input type="text" class="form-control" id="userName" placeholder="请输入姓名">
+                        <input type="text" class="form-control" id="userName" v-model="newUser.name" placeholder="请输入姓名">
                     </div>
                     <div class="form-group">
                         <label for="age">年龄：</label>
-                        <input type="text" class="form-control" id="age" placeholder="请输入年龄">
+                        <input type="text" class="form-control" id="age" v-model="newUser.age" placeholder="请输入年龄">
                     </div>
                     <div class="form-group">
                         <label for="salary">薪资：</label>
-                        <input type="text" class="form-control" id="salary" placeholder="请输入薪资">
+                        <input type="text" class="form-control" id="salary" v-model="newUser.salary" placeholder="请输入薪资">
                     </div>
                     <div class="form-group">
                         <label for="phoneNumber">电话号码：</label>
-                        <input type="text" class="form-control" id="phoneNumber" placeholder="请输入电话号码">
+                        <input type="text" class="form-control" id="phoneNumber" v-model="newUser.phoneNumber" placeholder="请输入电话号码">
                     </div>
-                    <button type="submit" class="btn btn-default">提交</button>
-                    <button type="submit" class="btn btn-danger">重制</button>
+                    <button type="button" class="btn btn-default" @click="saveUserInfo">提交</button>
+                    <button type="button" class="btn btn-danger" @click="resetInfo">重制</button>
                 </form>
             </div>
         </div>
@@ -106,18 +107,87 @@
         el:"#app",
         data:{
             users:[],   //users数组应为空，由后端服务接口进行赋值，在页面加载完成之前完成赋值，所以需要vue生命周期函数
+            newUser:{},   //用于存储用户的双向绑定
+            userName:"",
+            userPhoneNumber:"",
         },
-        methods:{},
+        methods:{
+
+            saveUserInfo(){
+                console.log(this.newUser);
+                axios.post('http://localhost:8080/demo/user/save',this.newUser)
+                     .then((response) => {
+                         console.log(response);
+                         if(response.data.isSuccess){
+                             //保存成功，更新查询页面
+                             this.findAll();
+
+                             //清空输入栏里的信息
+                             this.newUser = {};
+                         }else {
+                             alert(response.data.message);
+                             this.newUser = {};
+                         }
+                     }).catch((error) => {
+                    console.log(error);
+                })
+            },
+
+            resetInfo(){
+                this.newUser = {};
+            },
+
+            findAll(){
+                //查询所有用户信息
+                axios.get("http://localhost:8080/demo/user/findAll")
+                    .then((response) => {
+                        console.log(response.data);
+                        this.users = response.data;
+                    }).catch(function (error){
+                    console.log(error);
+                });
+            },
+
+            deleteUserById(id){
+                if(window.confirm("确认删除这条记录吗？")){
+                    console.log(id);
+                    axios.get("http://localhost:8080/demo/user/deleteUserById?id=" + id)
+                        .then((response) =>{
+                            console.log(response);
+                            if(response.data.isSuccess){
+                                this.findAll();
+                            }else {
+                                alert(response.data.message);
+                            }
+                        }).catch((error) => {
+                        console.log(error);
+                    })
+                }
+            },
+
+            findUserById(id){
+                console.log(id);
+                axios.get("http://localhost:8080/demo/user/findUserById?id=" + id)
+                     .then((response) => {
+                         console.log(response.data);
+                         this.newUser = response.data;
+                     });
+            },
+
+            findUserByNameOrPhone(){
+                console.log(this.userName);
+                console.log(this.userPhoneNumber);
+                axios.get("http://localhost:8080/demo/user/findUserByNameOrPhone?name=" + this.username + "&phoneNumber=" + this.userPhoneNumber)
+                     .then((response) => {
+                         console.log(response.data);
+                         this.users = response.data;
+                     });
+            }
+
+        },
         //生命周期函数
         created(){
-            //查询所有用户信息
-            axios.get("http://localhost:8080/demo/user/findAll")
-                .then((response) => {
-                    console.log(response.data);
-                    this.users = response.data;
-            }).catch(function (error){
-                console.log(error);
-            });
+            this.findAll();
         }
 
     })

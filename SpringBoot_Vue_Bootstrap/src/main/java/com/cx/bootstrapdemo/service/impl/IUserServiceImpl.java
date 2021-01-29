@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -19,5 +20,31 @@ public class IUserServiceImpl implements IUserService {
     @Override
     public List<User> findAll() {
         return userDao.findAll();
+    }
+
+    @Override
+    public void save(User user) {
+        user.setId(UUID.randomUUID().toString());
+        userDao.save(user);
+    }
+
+    @Override
+    public void deleteUserById(String id){
+        userDao.deleteUserById(id);
+    }
+
+    @Override
+    public User findUserByID(String id) {
+        return userDao.findUserById(id);
+    }
+
+    @Override
+    public List<User> findUserByNameOrPhone(String name, String phoneNumber) {
+        return userDao.findUserByNameOrPhone(name,phoneNumber);
+    }
+
+    @Override
+    public void update(User user) {
+        userDao.update(user);
     }
 }

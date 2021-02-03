@@ -22,6 +22,7 @@
           <module>emsdemo</module>
           <module>SpringBoot_Vue</module>
           <module>SpringBoot_Vue_Bootstrap</module>
+          <module>SpringBoot_Vue_Router</module>
      </modules>
 
      <dependencies>

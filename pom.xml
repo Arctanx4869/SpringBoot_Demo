@@ -23,6 +23,7 @@
           <module>SpringBoot_Vue</module>
           <module>SpringBoot_Vue_Bootstrap</module>
           <module>SpringBoot_Vue_Router</module>
+          <module>SpringBoot_VueCli</module>
      </modules>
 
      <dependencies>
